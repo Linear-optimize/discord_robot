@@ -16,7 +16,7 @@ bot.secretld = os.getenv("secretld")
 bot.secretkey = os.getenv("secretkey")
 bot.API_KEY = os.getenv("API_KEY")
 
-token = os.getenv("DISCORD_BOT_TOKEN")
+token = os.getenv("DISCORD_TOKEN")
 
 
 @bot.command()
