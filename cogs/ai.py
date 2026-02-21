@@ -19,7 +19,16 @@ class AiCog(commands.Cog):
 
         answer = response.choices[0].message.content
 
-        await ctx.send(answer)
+        if len(answer)<= 2000:
+            await ctx.send(answer)
+        else:
+            chunks = [answer[i:i + 1900] for i in range(0, len(answer), 1900)]
+            for index,chunks in enumerate(chunks):
+                if index==0:
+                    await ctx.send(chunks)
+                else:
+                    await ctx.send(chunks)    
+        
 
 
 async def setup(bot):
