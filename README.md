@@ -33,12 +33,14 @@ my_robot
 ## 📦安装依赖
 > pip
 ```bash
-pip install openai discord.py aiohttp tencentcloud-sdk-python python-dotenv yt-dlp
+pip install -r requirements.txt
 ```
+
 > uv
 ```bash
-uv add openai discord.py aiohttp tencentcloud-sdk-python python-dotenv yt-dlp
+uv sync
 ```
+
 
 ## 🚀快速开始
 1. 在 **.env** 文件中配置你的 **DISCORD_BOT_TOKEN** ,**OPENAI_API_KEY** **Secretld**和**SecretKey**
