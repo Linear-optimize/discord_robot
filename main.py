@@ -11,11 +11,13 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+bot.base_url=os.getenv("BASE_URL")
 bot.api_key = os.getenv("OPENAI_API_KEY")
 bot.secretld = os.getenv("secretld")
 bot.secretkey = os.getenv("secretkey")
 bot.API_KEY = os.getenv("API_KEY")
-
+bot.model=os.getenv("MODEL")
+print(bot.base_url)
 token = os.getenv("DISCORD_TOKEN")
 
 

@@ -11,10 +11,10 @@ class AiCog(commands.Cog):
         await ctx.defer()
 
         client = AsyncOpenAI(
-            api_key=self.bot.api_key, base_url="https://api.bltcy.ai/v1"
+            api_key=self.bot.api_key, base_url=self.bot.base_url
         )
         response = await client.chat.completions.create(
-            model="gpt-4o", messages=[{"role": "user", "content": question}]
+            model=self.bot.model, messages=[{"role": "user", "content": question}]
         )
 
         answer = response.choices[0].message.content
