@@ -10,25 +10,22 @@ class AiCog(commands.Cog):
     async def ask(self, ctx, question: str):
         await ctx.defer()
 
-        client = AsyncOpenAI(
-            api_key=self.bot.api_key, base_url=self.bot.base_url
-        )
+        client = AsyncOpenAI(api_key=self.bot.api_key, base_url=self.bot.base_url)
         response = await client.chat.completions.create(
             model=self.bot.model, messages=[{"role": "user", "content": question}]
         )
 
         answer = response.choices[0].message.content
 
-        if len(answer)<= 2000:
+        if len(answer) <= 2000:
             await ctx.send(answer)
         else:
-            chunks = [answer[i:i + 1900] for i in range(0, len(answer), 1900)]
-            for index,chunks in enumerate(chunks):
-                if index==0:
+            chunks = [answer[i : i + 1900] for i in range(0, len(answer), 1900)]
+            for index, chunks in enumerate(chunks):
+                if index == 0:
                     await ctx.send(chunks)
                 else:
-                    await ctx.send(chunks)    
-        
+                    await ctx.send(chunks)
 
 
 async def setup(bot):

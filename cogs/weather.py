@@ -1,6 +1,49 @@
 import discord
 from discord.ext import commands
 
+# 建议放在类外面，作为常量，节省资源
+WEATHER_MESSAGES = {
+    "0": {"label": "未知", "emoji": "❓"},
+    "1000": {"label": "晴朗", "emoji": "☀️"},
+    "1100": {"label": "大部分晴朗", "emoji": "🌤️"},
+    "1101": {"label": "多云", "emoji": "⛅"},
+    "1102": {"label": "阴天", "emoji": "☁️"},
+    "1001": {"label": "阴天", "emoji": "☁️"},
+    "2000": {"label": "有雾", "emoji": "🌫️"},
+    "2100": {"label": "轻雾", "emoji": "🌫️"},
+    "4000": {"label": "毛毛雨", "emoji": "🌦️"},
+    "4001": {"label": "下雨", "emoji": "🌧️"},
+    "4200": {"label": "小雨", "emoji": "🌧️"},
+    "4201": {"label": "大雨", "emoji": "🌊"},
+    "5000": {"label": "下雪", "emoji": "❄️"},
+    "5001": {"label": "小雪/飘雪", "emoji": "🌨️"},
+    "5100": {"label": "轻雪", "emoji": "🌨️"},
+    "5101": {"label": "大雪", "emoji": "🏔️"},
+    "6000": {"label": "冻毛毛雨", "emoji": "🥶"},
+    "6001": {"label": "冻雨", "emoji": "🧊"},
+    "6200": {"label": "轻冻雨", "emoji": "🧊"},
+    "6201": {"label": "重冻雨", "emoji": "🧊"},
+    "7000": {"label": "冰雹", "emoji": "☄️"},
+    "7101": {"label": "重冰雹", "emoji": "💥"},
+    "7102": {"label": "轻冰雹", "emoji": "💎"},
+    "8000": {"label": "雷暴", "emoji": "⛈️"},
+    "1103": {"label": "多云转晴", "emoji": "🌤️"},
+    "2101": {"label": "轻雾伴晴", "emoji": "🌫️☀️"},
+    "4204": {"label": "阵性毛毛雨", "emoji": "🌦️"},
+    "5108": {"label": "雨夹雪", "emoji": "🌨️🌧️"},
+    "8001": {"label": "雷阵雨转晴", "emoji": "⛈️☀️"},
+}
+
+COLOR_MAP = {
+    "1": 0xFFD700,
+    "2": 0xBDC3C7,
+    "4": 0x3498DB,
+    "5": 0xFFFFFF,
+    "6": 0x00CED1,
+    "7": 0xE0FFFF,
+    "8": 0x8E44AD,
+}
+
 
 class WeatherCog(commands.Cog):
     def __init__(self, bot):
@@ -11,45 +54,69 @@ class WeatherCog(commands.Cog):
         await ctx.defer()
         session = self.bot.http_session
 
+        # 1. 获取地理编码
         async with session.get(
-            "http://api.openweathermap.org/geo/1.0/direct",
-            params={"q": city, "limit": 1, "appid": self.bot.API_KEY},
-        ) as req:
-            geo = await req.json()
+            "https://restapi.amap.com/v3/geocode/geo",
+            params={"address": city, "key": self.bot.map_key},
+        ) as response:
+            geo = await response.json()
 
-        lat = geo[0]["lat"]
-        lon = geo[0]["lon"]
+        if not geo.get("geocodes"):
+            return await ctx.send(f"❌ 找不到地点: {city}")
 
+        req_str = geo["geocodes"][0]["location"]
+        lon, lat = req_str.split(",")
+
+        # 2. 获取天气数据
         async with session.get(
-            "https://api.openweathermap.org/data/2.5/weather",
+            "https://api.tomorrow.io/v4/weather/forecast",
             params={
-                "lat": lat,
-                "lon": lon,
-                "appid": self.bot.API_KEY,
+                "location": f"{lat},{lon}",
+                "fields": "temperature,precipitationProbability,weatherCode",
                 "units": "metric",
-                "lang": "zh_cn",
+                "apikey": self.bot.weather_key,
             },
         ) as reqs:
-            req = await reqs.json()
+            weather_data = await reqs.json()
 
-        city_name = req["name"]
-        desc = req["weather"][0]["description"]
-        temp = req["main"]["temp"]
-        humidity = req["main"]["humidity"]
-        wind_speed = req["wind"]["speed"]
+        # 3. 解析与展示
+        try:
+            current_values = weather_data["timelines"]["minutely"][0]["values"]
+            temp = current_values.get("temperature", "N/A")
+            prob = current_values.get("precipitationProbability", 0)
+            code = current_values.get("weatherCode", 1000)
 
-        embed = discord.Embed(
-            title=f"🌤 {city_name} 当前天气",
-            description=desc,
-            color=0x4FC3F7,
-        )
+            code_str = str(code)
+            base_code = code_str[:4]  # 匹配核心代码
 
-        embed.add_field(name="🌡 温度", value=f"{temp} °C", inline=True)
-        embed.add_field(name="💧 湿度", value=f"{humidity} %", inline=True)
-        embed.add_field(name="🌬 风速", value=f"{wind_speed} m/s", inline=True)
-        embed.set_footer(text="数据来源：OpenWeatherMap")
+            # 决定图标 URL (如果是 4 位则补 0 变白天)
+            icon_suffix = code_str if len(code_str) >= 5 else f"{code_str}0"
+            icon_url = f"https://www.tomorrow.io/v1/static/assets/weather_icons/v2/color/{icon_suffix}.png"
 
-        await ctx.send(embed=embed)
+            info = WEATHER_MESSAGES.get(
+                base_code, {"label": f"未知({code_str})", "emoji": "🌡️"}
+            )
+            color = COLOR_MAP.get(base_code[0], 0x2F3136)
+
+            embed = discord.Embed(
+                title=f"🌡️ {city} 实时天气报告",
+                description=f"当前状态：**{info['label']} {info['emoji']}**",
+                color=color,
+                timestamp=ctx.message.created_at,
+            )
+            embed.set_thumbnail(url=icon_url)
+            embed.add_field(name="🌡️ 当前温度", value=f"{temp}°C", inline=True)
+            embed.add_field(name="💧 降水概率", value=f"{prob}%", inline=True)
+            embed.set_footer(
+                text="数据来源: Tomorrow.io",
+                icon_url="https://www.tomorrow.io/favicon.ico",
+            )
+
+            # 不要忘了这一行！
+            await ctx.send(embed=embed)
+
+        except (KeyError, IndexError) as e:
+            await ctx.send(f"❌ 解析天气数据失败。")
 
 
 async def setup(bot):
