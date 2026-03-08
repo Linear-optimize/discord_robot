@@ -54,7 +54,7 @@ class WeatherCog(commands.Cog):
         await ctx.defer()
         session = self.bot.http_session
 
-        # 1. 获取地理编码
+        
         async with session.get(
             "https://restapi.amap.com/v3/geocode/geo",
             params={"address": city, "key": self.bot.map_key},
@@ -79,7 +79,7 @@ class WeatherCog(commands.Cog):
         ) as reqs:
             weather_data = await reqs.json()
 
-        # 3. 解析与展示
+        
         try:
             current_values = weather_data["timelines"]["minutely"][0]["values"]
             temp = current_values.get("temperature", "N/A")
@@ -87,9 +87,9 @@ class WeatherCog(commands.Cog):
             code = current_values.get("weatherCode", 1000)
 
             code_str = str(code)
-            base_code = code_str[:4]  # 匹配核心代码
+            base_code = code_str[:4]  
 
-            # 决定图标 URL (如果是 4 位则补 0 变白天)
+            
             icon_suffix = code_str if len(code_str) >= 5 else f"{code_str}0"
             icon_url = f"https://www.tomorrow.io/v1/static/assets/weather_icons/v2/color/{icon_suffix}.png"
 
@@ -112,7 +112,7 @@ class WeatherCog(commands.Cog):
                 icon_url="https://www.tomorrow.io/favicon.ico",
             )
 
-            # 不要忘了这一行！
+            
             await ctx.send(embed=embed)
 
         except (KeyError, IndexError) as e:
