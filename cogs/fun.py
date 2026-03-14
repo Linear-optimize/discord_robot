@@ -42,22 +42,22 @@ class FunCog(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.hybrid_command(
-        name="wallpaper", description="wallpaper图片,type为acg或者wallpaper"
+        name="image", description="随机图片"
     )
-    async def wallpaper(self, ctx, type: str):
+    async def image(self, ctx):
         await ctx.defer()
 
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0"
         }
 
-        params = {"type": type, "return": "json"}
-        url = "https://v2.xxapi.cn/api/random4kPic"
+        params = { "return": "json"}
+        url = "https://api.yppp.net/pc.php"
         session = self.bot.http_session
         async with session.get(url=url, headers=headers, params=params) as response:
             data = await response.json(content_type=None)
 
-        url_image = data["data"]
+        url_image = data["acgurl"]
 
         embed = discord.Embed()
         embed.set_image(url=url_image)
