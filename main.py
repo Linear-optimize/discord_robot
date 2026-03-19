@@ -31,7 +31,7 @@ async def synccommands(ctx):
 
 async def load_cogs():
     cogs = [
-        "cogs.fun",
+        "cogs.base_use",
         "cogs.ai",
         "cogs.translate",
         "cogs.weather",

@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-class FunCog(commands.Cog):
+class BaseUseCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -66,4 +66,4 @@ class FunCog(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(FunCog(bot))
+    await bot.add_cog(BaseUseCog(bot))
