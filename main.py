@@ -35,7 +35,6 @@ async def load_cogs():
         "cogs.ai",
         "cogs.translate",
         "cogs.weather",
-        
     ]
     for cog in cogs:
         await bot.load_extension(cog)

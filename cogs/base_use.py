@@ -41,9 +41,7 @@ class BaseUseCog(commands.Cog):
 
             await ctx.send(embed=embed)
 
-    @commands.hybrid_command(
-        name="image", description="随机图片"
-    )
+    @commands.hybrid_command(name="image", description="随机图片")
     async def image(self, ctx):
         await ctx.defer()
 
@@ -51,7 +49,7 @@ class BaseUseCog(commands.Cog):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0"
         }
 
-        params = { "return": "json"}
+        params = {"return": "json"}
         url = "https://api.yppp.net/pc.php"
         session = self.bot.http_session
         async with session.get(url=url, headers=headers, params=params) as response:
