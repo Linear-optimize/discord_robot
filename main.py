@@ -18,7 +18,7 @@ bot.secretkey = os.getenv("secretkey")
 bot.weather_key = os.getenv("WEATHER_KEY")
 bot.map_key = os.getenv("MAP_KEY")
 bot.model = os.getenv("MODEL")
-print(bot.base_url)
+
 token = os.getenv("DISCORD_TOKEN")
 
 
