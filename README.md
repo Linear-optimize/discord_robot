@@ -1,68 +1,201 @@
-# 一个简单的Discord机器人
+# Discord Multi-Feature Bot (Python)
 
-## 📂项目结构
-```
-my_robot
-├─ .python-version
-├─ cogs
-│  ├─ ai.py
-│  ├─ bilibili.py
-│  ├─ fun.py
-│  ├─ translate.py
-│  ├─ video.py
-│  ├─ weather.py
-│  └─ __init__.py
-├─ LICENSE
-├─ main.py
-├─ pyproject.toml
-├─ README.md
-├─ utils
-│  └─ updown_bilibili.py
-└─ uv.lock
+An asynchronous Discord bot built with `discord.py`, featuring AI chat, weather query, translation, random image commands, and utility commands. This project is suitable for learning and extension.
 
-```
+## Features
 
-## ✨功能特点
- - ✅ **AI问答** - 接入了**chatgpt**
- - ✅ **天气询问** - 使用OpenWeather的api
- - ✅ **随机图片** - 第三方api
- - ✅ **简单翻译** - tencent翻译api、
- - ✅ **斜杠命令** - 支持支持 Hybrid Commands（同步后可在 Discord 直接输入 `/` 使用）
- 
+- 🤖 `ask`: AI Q&A via OpenAI.
+- 🌤️ `weather`: Real-time weather by city (Amap geocoding + Tomorrow.io forecast).
+- 🌐 `translate`: Tencent Cloud translation.
+- 🖼️ `image` / `draw`: Random image and tag-based image fetching.
+- 🛠️ `ping` / `add`: Basic utility commands.
+- ⚡ Hybrid Commands are supported (prefix and slash command styles).
 
-## 📦安装依赖
-> pip
-```bash
-pip install -r requirements.txt
+## Project Structure (Current Repo)
+
+```text
+.
+├── cogs/
+│   ├── ai.py
+│   ├── base_use.py
+│   ├── translate.py
+│   ├── weather.py
+│   └── __init__.py
+├── main.py
+├── pyproject.toml
+├── requirements.txt
+├── uv.lock
+└── README.md
 ```
 
-> uv
+
+
+## Requirements
+
+- Python 3.10+
+- Discord Bot Token
+- API keys for OpenAI / Tencent Cloud / Tomorrow.io / Amap (depending on enabled commands)
+
+## Install Dependencies
+
+Recommended (`uv`, aligned with lockfile):
+
 ```bash
 uv sync
 ```
 
+Or with pip:
 
-## 🚀快速开始
-1. 在 **.env** 文件中配置你的 **DISCORD_BOT_TOKEN** ,**OPENAI_API_KEY** **Secretld**和**SecretKey**
+```bash
+pip install -r requirements.txt
+```
 
-2. 运行脚本(推荐uv)
->uv
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+# Discord
+DISCORD_TOKEN=your_discord_bot_token
+
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
+BASE_URL=https://api.openai.com/v1
+MODEL=gpt-4o-mini
+
+# Tencent Translation
+secretld=your_tencent_secret_id
+secretkey=your_tencent_secret_key
+
+# Weather
+WEATHER_KEY=your_tomorrow_io_api_key
+MAP_KEY=your_amap_api_key
+```
+
+> Keep names exactly as the code expects, especially `secretld` (lowercase `l` + `d`).
+
+## Run
+
 ```bash
 uv run main.py
 ```
->原生python
+
+Or:
+
 ```bash
 python main.py
 ```
-## ⚖️ 技术评估
-- **异步驱动**: 全程使用 `aiohttp` 和 `AsyncOpenAI`，保证高并发下机器人不卡顿。
-- **模块化设计**: 采用 `Discord Cogs` 架构，功能解耦，支持热加载。
-- **高效连接池**: 全局共用一个 `ClientSession`，优化网络资源占用。
-- **混合指令**: 完美适配 `Hybrid Commands`，兼顾老玩家习惯与新斜杠体验。
 
-## 🚧改进点
-- [ ] 错误处理: 增加全局异常捕获，防止 API 调用失败导致崩溃。
-- [ ] 日志系统: 接入 logging 模块，记录指令调用频率与错误堆栈
-- [ ] 配置优化: 统一 .env 变量命名规范，增强代码可读性
+After startup, an admin can run `!synccommands` to sync command definitions.
+
+## Development Notes
+
+- Cogs are loaded in `load_cogs()` in `main.py`.
+- HTTP requests reuse a shared `aiohttp.ClientSession`.
+- Add new features as separate cogs and register them in `load_cogs()`.
+
+## License
+
+See `LICENSE` in the repository root.
+
+---
+
+# Discord 多功能机器人（Python）
+
+基于 `discord.py` 的异步机器人项目，当前提供 AI 问答、天气查询、翻译、随机图片与基础工具命令，适合学习和二次开发。
+
+## 功能概览
+
+- 🤖 `ask`：调用 OpenAI 进行问答。
+- 🌤️ `weather`：查询城市实时天气（高德地理编码 + Tomorrow.io）。
+- 🌐 `translate`：调用腾讯云翻译。
+- 🖼️ `image` / `draw`：获取随机图片或按关键词取图。
+- 🛠️ `ping` / `add`：基础测试与计算命令。
+- ⚡ 支持 Hybrid Commands（可作为前缀命令和 `/` 命令使用）。
+
+## 项目结构（当前仓库）
+
+```text
+.
+├── cogs/
+│   ├── ai.py
+│   ├── base_use.py
+│   ├── translate.py
+│   ├── weather.py
+│   └── __init__.py
+├── main.py
+├── pyproject.toml
+├── requirements.txt
+├── uv.lock
+└── README.md
+```
 
 
+
+## 环境要求
+
+- Python 3.10+
+- Discord Bot Token
+- OpenAI、腾讯云、Tomorrow.io、高德地图等 API Key（按需启用）
+
+## 安装依赖
+
+推荐使用 `uv`（与仓库锁文件一致）：
+
+```bash
+uv sync
+```
+
+或使用 `pip`：
+
+```bash
+pip install -r requirements.txt
+```
+
+## 环境变量配置
+
+在项目根目录新建 `.env`：
+
+```env
+# Discord
+DISCORD_TOKEN=你的Discord机器人Token
+
+# OpenAI
+OPENAI_API_KEY=你的OpenAI密钥
+BASE_URL=https://api.openai.com/v1
+MODEL=gpt-4o-mini
+
+# 腾讯翻译
+secretld=你的腾讯SecretId
+secretkey=你的腾讯SecretKey
+
+# 天气能力
+WEATHER_KEY=你的Tomorrow.io密钥
+MAP_KEY=你的高德地图密钥
+```
+
+> 变量名需与代码读取保持一致，尤其是 `secretld`（小写 `l` + `d`）。
+
+## 启动项目
+
+```bash
+uv run main.py
+```
+
+或：
+
+```bash
+python main.py
+```
+
+启动后可在服务器中使用命令；管理员可用 `!synccommands` 手动同步指令。
+
+## 开发说明
+
+- 所有功能以 `cogs` 模块加载，在 `main.py` 的 `load_cogs()` 中注册。
+- HTTP 请求复用 `aiohttp.ClientSession`，避免重复建连。
+- 新增命令建议放到新的 Cog 文件中，并在 `load_cogs()` 中追加扩展路径。
+
+## License
+
+请参考仓库根目录 `LICENSE` 文件。
