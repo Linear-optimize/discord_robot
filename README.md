@@ -28,7 +28,7 @@
 └── README.md
 ```
 
-> 当前项目**没有** `fun.py`、`bilibili.py`、`video.py` 等文件，文档以仓库实际内容为准。
+
 
 ## 环境要求
 
